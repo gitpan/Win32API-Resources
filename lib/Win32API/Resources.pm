@@ -5,17 +5,17 @@
 #            bsturner@sprintparanet.com
 #            Friday, April 09, 1999
 #
-# Updated on Wednesday, August 25, 1999
+# Updated on Wednesday, July 21, 1999
 #
 # All functions verfied on Win95a and WinNT 4.0
-# (Some functions are WinNT only)
+# (see the notes on GetDiskFreeSpace and GetDiskFreeSpaceEx)
 ###############################################
 package Win32API::Resources;
 
 use Win32;
 use Win32::API;
 use strict qw(vars);
-$Win32API::Resources::VERSION = '0.07';
+$Win32API::Resources::VERSION = '0.06';
 
 #*********************************************************
 #*  IsEXE16 wrapper around GetBinaryType API - based on code by Aldo Calpini
@@ -850,24 +850,17 @@ sub RasEnumConnections
 	my $lprasconn = pack("L*", 32, 0, 0, 0, 0);
 	my $lpcb = pack("L", 32);
 	my $lpcConnections = pack("L", 0);
-	my $Return;
 
 	# RasEnumConnections API direct
 	my $RasEnumConnections = new Win32::API("rasapi32", "RasEnumConnectionsA", [qw(P P P)], 'N');
-	if ($RasEnumConnections)
-		{
-		$Return = $RasEnumConnections->Call($lprasconn, $lpcb, $lpcConnections);
-		}
-	else	{
-		return;
-		}
+	my $Return = $RasEnumConnections->Call($lprasconn, $lpcb, $lpcConnections);
 	if ($Return == 0)
 		{
 		$lpcConnections = unpack("L", $lpcConnections);
 		return $lpcConnections;
 		}
 	else	{
-		return;
+		return undef;
 		}
 	}
 #*********************************************************
